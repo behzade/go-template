@@ -28,20 +28,32 @@ type Config struct {
 	} `yaml:"opentelemtry"`
 }
 
-func LoadConfig() (*Config, error) {
+var globalConfig *Config
+
+func GetConfig() Config {
+	if globalConfig == nil {
+		panic("config is not loaded")
+	}
+
+	return *globalConfig 
+}
+
+func initConfig() error {
 	cfg := Config{}
 
 	err := readYamlConfig(&cfg)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	err = envconfig.Process("", &cfg)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &cfg, nil
+	globalConfig = &cfg
+
+	return nil
 }
 
 func readYamlConfig(cfg *Config) error {
