@@ -1,0 +1,26 @@
+---
+services:
+  app:
+    container_name: app
+    build:
+      context: ../.
+      dockerfile: ./build/Dockerfile.dev
+      args:
+        DOCKER_REGISTRY: ${DOCKER_REGISTRY:-docker.io}
+    ports:
+     - "${HOST_PORT:-8080}:8080"
+    volumes:
+      - ../internal:/app/internal
+      - ../cmd:/app/cmd
+      - ~/go/pkg/mod:/go/pkg/mod
+    environment:
+      PORT: "8080"
+      ENV: "local"
+    networks:
+      app_network:
+
+volumes:
+  go-modules:
+
+networks:
+  app_network:
