@@ -8,10 +8,12 @@ import (
 )
 
 type Config struct {
+	Service struct {
+		Name string `yaml:"name" envconfig:"SERVICE_NAME"`
+		Env  string `yaml:"env" envconfig:"SERVICE_ENV"`
+	} `yaml:"service"`
 	Server struct {
-		Port int    `yaml:"port" envconfig:"SERVER_PORT"`
-		Name string `yaml:"name" envconfig:"SERVER_NAME"`
-		Env  string `yaml:"env" envconfig:"SERVER_ENV"`
+		Port int `yaml:"port" envconfig:"SERVER_PORT"`
 	} `yaml:"server"`
 	Database struct {
 		Host string `yaml:"host" envconfig:"DB_HOST"`
@@ -34,7 +36,7 @@ func LoadConfig() (*Config, error) {
 		return nil, err
 	}
 
-	err = readEnvConfig(&cfg)
+	err = envconfig.Process("", &cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -50,14 +52,10 @@ func readYamlConfig(cfg *Config) error {
 	defer f.Close()
 
 	decoder := yaml.NewDecoder(f)
-	err = decoder.Decode(cfg)
+	err = decoder.Decode(&cfg)
 	if err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func readEnvConfig(cfg *Config) error {
-	return envconfig.Process("", cfg)
 }

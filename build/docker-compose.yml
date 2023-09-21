@@ -12,15 +12,11 @@ services:
     volumes:
       - ../internal:/app/internal
       - ../cmd:/app/cmd
+      - ../config.yml:/app/config.yml
       - ~/go/pkg/mod:/go/pkg/mod
-    environment:
-      PORT: "8080"
-      ENV: "local"
+    env_file: .env
     networks:
       app_network:
-
-volumes:
-  go-modules:
 
 networks:
   app_network:

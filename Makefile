@@ -1,6 +1,6 @@
 .PHONY: *
 
-COMPOSE = docker compose -f ./build/docker-compose.yml --env-file ./.env
+COMPOSE = docker compose -f ./build/docker-compose.yml
 
 build:
 	$(COMPOSE) build

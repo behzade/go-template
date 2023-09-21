@@ -1,0 +1,14 @@
+service:
+  name: fiber-template
+  env: local
+server:
+  port: 8080
+database:
+  host: mysql
+  port: 3306
+  name: localdb
+  user: root
+  pass: root
+opentelemtry:
+  host: otelcollector:4317
+  insecure: true

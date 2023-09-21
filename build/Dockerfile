@@ -29,6 +29,7 @@ RUN go test -v ./...
 FROM scratch as run
 
 COPY --from=build /app/bin/server /server-bin
+COPY ./config.yml /
 COPY --from=build /etc/passwd /etc/passwd
 
 USER 1001
