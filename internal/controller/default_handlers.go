@@ -7,7 +7,10 @@ import (
 )
 
 func indexHandler(c *fiber.Ctx) error {
-	return c.SendString("template project")
+	return c.JSON(
+		map[string]string{
+			"service_name": "template",
+		})
 }
 
 func checkHealthHandler(c *fiber.Ctx) error {

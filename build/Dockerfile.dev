@@ -3,13 +3,15 @@ ARG GO_VERSION=1.21
 
 FROM ${DOCKER_REGISTRY}/golang:${GO_VERSION}-bullseye
 
+ENV CGO_ENABLED=0\
+    GOOS=linux\
+    GOOARCH=amd64
+
 WORKDIR /app
 
 RUN go install github.com/bokwoon95/wgo@latest
 RUN go install entgo.io/ent/cmd/ent@latest
 
 COPY ./go.mod ./go.sum ./
-
-ENV GOPROXY=https://goproxy.cn
 
 CMD ["wgo", "run", "./cmd/server/server.go"]
