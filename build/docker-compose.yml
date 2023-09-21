@@ -17,6 +17,24 @@ services:
     env_file: .env
     networks:
       app_network:
+  mysql:
+    container_name: mysql
+    image: ${DOCKER_REGISTRY:-docker.io}/mysql:8.0
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=localdb
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - db:/var/lib/mysql
+    networks:
+      app_network:
+
+volumes:
+  db:
+    driver: local
 
 networks:
   app_network:
+    name: app_network
