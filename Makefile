@@ -14,3 +14,5 @@ restart:
 	$(COMPOSE) restart
 logs:
 	$(COMPOSE) logs --tail=100
+bash:
+	$(COMPOSE) exec app bash
