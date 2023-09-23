@@ -6,7 +6,7 @@ variable "schema" {
 variable "path" {
     type = string
     description = "template dir path"
-    default = "schema.sql"
+    default = "sql/schema"
 }
 
 data "template_dir" "schema" {
