@@ -57,7 +57,7 @@ func initConfig() error {
 }
 
 func readYamlConfig(cfg *Config) error {
-	f, err := os.Open("config.yml")
+	f, err := os.Open("config.yaml")
 	if err != nil {
 		return err
 	}

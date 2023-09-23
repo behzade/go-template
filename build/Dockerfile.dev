@@ -10,7 +10,7 @@ ENV CGO_ENABLED=0\
 WORKDIR /app
 
 RUN go install github.com/bokwoon95/wgo@latest
-RUN go install entgo.io/ent/cmd/ent@latest
+RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.20.0
 
 COPY ./go.mod ./go.sum ./
 

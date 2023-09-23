@@ -12,7 +12,9 @@ services:
     volumes:
       - ../internal:/app/internal
       - ../cmd:/app/cmd
-      - ../config.yml:/app/config.yml
+      - ../sql:/app/sql
+      - ../config.yaml:/app/config.yaml
+      - ../sqlc.yaml:/app/sqlc.yaml
       - ~/go/pkg/mod:/go/pkg/mod
     env_file: .env
     networks:
@@ -24,12 +26,35 @@ services:
       - SYS_NICE
     restart: always
     environment:
-      - MYSQL_DATABASE=localdb
       - MYSQL_ROOT_PASSWORD=root
     volumes:
       - db:/var/lib/mysql
     networks:
       app_network:
+    ports:
+      - 10002:3306
+  atlas:
+    image: ${DOCKER_REGISTRY:-docker.io}/arigaio/atlas:0.14.1
+    container_name: atlas
+    volumes:
+      - ../sql/schema.sql:/schema.sql
+      - ../atlas.hcl:/atlas.hcl
+    networks:
+      app_network:
+    depends_on:
+      - mysql_dev
+    profiles:
+      - atlas
+  mysql_dev:
+    container_name: mysql_dev
+    image: ${DOCKER_REGISTRY:-docker.io}/mysql:8.0
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      app_network:
+    profiles:
+      - atlas
 
 volumes:
   db:
