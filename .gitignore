@@ -1,1 +1,2 @@
 build/.env
+sql/schema/schema.sql
