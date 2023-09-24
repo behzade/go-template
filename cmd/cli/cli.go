@@ -35,6 +35,7 @@ func main() {
 	println(msg)
 
 	if err != nil {
+		println(err.Error())
 		os.Exit(1)
 	}
 	os.Exit(0)
@@ -72,8 +73,11 @@ func getAlters() (string, error) {
 		return "", nil
 	}
 
-	msg, err := diffDBWithSchema()
-	return string(msg), err
+	res, err := diffDBWithSchema()
+	if err != nil {
+		return "", err
+	}
+	return res.String(), err
 }
 
 func applyAlters() (string, error) {
@@ -82,6 +86,9 @@ func applyAlters() (string, error) {
 		return "", nil
 	}
 
-	msg, err := syncDBWithSchema()
-	return string(msg), err
+	res, err := syncDBWithSchema()
+	if err != nil {
+		return "", err
+	}
+	return res.String(), err
 }
