@@ -46,7 +46,22 @@ Project config is stored in the ``config.yaml`` at the root of the project. This
 You can override the local config with env variables by adding the file ``build/.env``.
 ### Database
 #### Schema
-Database schema is stored in the ``schema.tmpl.sql`` file in the ``sql/schema-template`` directory. You can put your partial templates in the same directory. The template is rendered to a single sql file which represents the desired database state.
+Database schema is stored in the ``schema.tmpl.sql`` file in the ``sql/schema-template`` directory. You can put your partial templates in the same directory. The template is rendered to a single sql file which represents the desired database state. Schema template example with partial templates:
+```sql
+{{define "id"}}`id` bigint unsigned not null auto_increment{{end}}
+{{define "createdAt"}}`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP{{end}}
+{{define "updatedAt"}}`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP{{end}}
+
+create database {{.schema}};
+
+create table {{.schema}}.user (
+    {{template "id"}},
+    `name` varchar(255) not null,
+    {{template "createdAt"}},
+    {{template "updatedAt"}},
+    PRIMARY KEY(`id`)
+);
+```
 ##### Altering the Schema
 To change the database schema, first make your changes to the template file and then run the ``make get_alters`` to get the db alters that need to be ran. You can run the alters using the ``make apply_alters`` on the local database. On production env this will be handled in a CI/CD stage. We use the [atlasgo](https://atlasgo.io) to diff/apply the schema.
 
