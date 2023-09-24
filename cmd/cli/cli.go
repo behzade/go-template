@@ -15,7 +15,7 @@ func main() {
 	args := os.Args[1:]
 
 	if len(args) != 1 {
-		help()
+		help("no args")
 	}
 
 	arg := args[0]
@@ -28,25 +28,27 @@ func main() {
 	case applyAltersArg:
 		action = applyAlters
 	default:
-		help()
+		help(arg)
 	}
 
-	msg,err := action()
+	msg, err := action()
 	println(msg)
-	
+
 	if err != nil {
 		os.Exit(1)
 	}
 	os.Exit(0)
 }
 
-func help() {
+func help(arg string) {
 	fmt.Printf(
-		`Available commands:
+		`%v
+		Available commands:
 	%v  %v
 	%v  %v
 	%v  %v
 `,
+		arg,
 		updateEntityArg, "syncs generated entity with sql schema/query",
 		getAltersArg, "generates alters by comparing db and sql schema",
 		applyAltersArg, "syncs db with sql schema",
