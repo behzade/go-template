@@ -73,6 +73,6 @@ func (q *Queries) GetUser(ctx context.Context, id uint64) (LocaldbUser, error) {
 ```
 Keep in mind that this package needs to be regenerated after making changes to schema/query using ``make update_entity``.
 ### Controller
-``fiber`` is the router of choice for this project. Define new routes in the ``controller/router.go``. Refer to ``fiber`` docs for more info.
+``fiber`` is the router of choice for this project. Define new routes in the ``controller/router.go``. Refer to [fiber](https://github.com/gofiber/fiber) docs for more info.
 ### Service
 ``service`` package is responsible for handling config init and database connections and monitoring tools.
