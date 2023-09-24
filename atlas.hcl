@@ -1,16 +1,9 @@
 variable "schema" {
     type = string
-    default = "default_db"
-}
-
-variable "path" {
-    type = string
-    description = "template dir path"
-    default = "sql/schema"
 }
 
 data "template_dir" "schema" {
-    path = var.path
+    path = "sql/schema"
     vars = {
         schema = var.schema
     }

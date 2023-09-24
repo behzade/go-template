@@ -7,15 +7,29 @@ package entity
 
 import (
 	"context"
+	"database/sql"
 )
 
-const getUser = `-- name: GetUser :one
-select id, created_at, updated_at from user where id = ?
+const createUser = `-- name: CreateUser :execresult
+insert into localdb.user (name) values (?)
 `
 
-func (q *Queries) GetUser(ctx context.Context, id uint64) (User, error) {
+func (q *Queries) CreateUser(ctx context.Context, name string) (sql.Result, error) {
+	return q.db.ExecContext(ctx, createUser, name)
+}
+
+const getUser = `-- name: GetUser :one
+select id, name, created_at, updated_at from localdb.user where id = ?
+`
+
+func (q *Queries) GetUser(ctx context.Context, id uint64) (LocaldbUser, error) {
 	row := q.db.QueryRowContext(ctx, getUser, id)
-	var i User
-	err := row.Scan(&i.ID, &i.CreatedAt, &i.UpdatedAt)
+	var i LocaldbUser
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
 	return i, err
 }

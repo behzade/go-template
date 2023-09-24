@@ -8,8 +8,9 @@ import (
 	"time"
 )
 
-type User struct {
+type LocaldbUser struct {
 	ID        uint64
+	Name      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

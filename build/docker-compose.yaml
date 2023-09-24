@@ -33,18 +33,6 @@ services:
       app_network:
     ports:
       - 10002:3306
-  atlas:
-    image: ${DOCKER_REGISTRY:-docker.io}/arigaio/atlas@sha256:b5733a57db810042d7d8d6e5ff71e15e22c63075107c71180dac9e028d97009f
-    container_name: atlas
-    volumes:
-      - ../sql:/sql
-      - ../atlas.hcl:/atlas.hcl
-    networks:
-      app_network:
-    depends_on:
-      - mysql_dev
-    profiles:
-      - atlas
   mysql_dev:
     container_name: mysql_dev
     image: ${DOCKER_REGISTRY:-docker.io}/mysql:8.0
@@ -53,8 +41,6 @@ services:
       - MYSQL_ROOT_PASSWORD=root
     networks:
       app_network:
-    profiles:
-      - atlas
 
 volumes:
   db:

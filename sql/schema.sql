@@ -1,6 +1,6 @@
-create database {{ .schema }};
+create database localdb;
 
-create table {{ .schema }}.user (
+create table localdb.user (
     `id` bigint unsigned not null auto_increment,
     `name` varchar(255) not null,
     `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
