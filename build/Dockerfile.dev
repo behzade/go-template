@@ -16,4 +16,4 @@ RUN curl -sSf https://atlasgo.sh | sh
 
 COPY ./go.mod ./go.sum ./
 
-CMD ["wgo", "run", "./cmd/server/server.go"]
+CMD ["wgo", "run", "/app/cmd/server"]
