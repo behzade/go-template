@@ -1,2 +1,2 @@
 build/.env
-sql/schema/schema.sql
+schema.sql
