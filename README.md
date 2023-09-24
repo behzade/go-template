@@ -64,6 +64,34 @@ create table {{.schema}}.user (
 ```
 ##### Altering the Schema
 To change the database schema, first make your changes to the template file and then run the ``make get_alters`` to get the db alters that need to be ran. You can run the alters using the ``make apply_alters`` on the local database. On production env this will be handled in a CI/CD stage. We use the [atlasgo](https://atlasgo.io) to diff/apply the schema.
+Let's add an age column to our user table:
+```sql
+create table {{.schema}}.user (
+    {{template "id"}},
+    `name` varchar(255) not null,
+    `age` int null,
+    {{template "createdAt"}},
+    {{template "updatedAt"}},
+    PRIMARY KEY(`id`)
+);
+```
+Now we should run ``make get_alters`` to see the changes database.
+```
+Pending Alters:
+ALTER TABLE `localdb`.`user` ADD COLUMN `age` int NULL
+```
+And ``make update_entity`` to update the generated go code in entity package:
+
+```go
+type LocaldbUser struct {
+	ID        uint64
+	Name      string
+	Age       sql.NullInt32
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+```
+
 
 ## Packages
 ### Entity
