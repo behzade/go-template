@@ -45,7 +45,8 @@ func help() {
 		`Available commands:
 	%v  %v
 	%v  %v
-	%v  %v`,
+	%v  %v
+`,
 		updateEntityArg, "syncs generated entity with sql schema/query",
 		getAltersArg, "generates alters by comparing db and sql schema",
 		applyAltersArg, "syncs db with sql schema",
