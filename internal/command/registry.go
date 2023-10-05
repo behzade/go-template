@@ -32,12 +32,11 @@ func NewDefault() *CommandRegistry {
 }
 
 func (r *CommandRegistry) MustRegister(command Command) {
-	err := r.validateCommandName(command.Name())
+	err := r.Register(command)
+
 	if err != nil {
 		panic(err)
 	}
-
-	r.commands[command.Name()] = command
 }
 
 func (r *CommandRegistry) Register(command Command) error {
