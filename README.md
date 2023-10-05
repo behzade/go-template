@@ -1,6 +1,6 @@
-# Fiber Template
-Go template project with fiber and mysql
-This project is a template for building web applications using Go, Fiber, and MySQL. It provides a dockerized environment, a config system, a database schema management, and an entity package for interacting with the database.
+# Go Template
+Go template project with echo and mysql
+This project is a template for building web applications using Go, echo, and MySQL. It provides a dockerized environment, a config system, a database schema management, and an entity package for interacting with the database.
 
 # Table of Contents
 - [Getting Started](#getting-started)
@@ -116,6 +116,6 @@ func (q *Queries) GetUser(ctx context.Context, id uint64) (LocaldbUser, error) {
 ```
 Keep in mind that this package needs to be regenerated after making changes to schema/query using ``make update_entity``.
 ### Controller
-``fiber`` is the router of choice for this project. Define new routes in the ``controller/router.go``. Refer to [fiber](https://github.com/gofiber/fiber) docs for more info.
+``echo`` is the router of choice for this project. Define new routes in the ``controller/router.go``. Refer to [echo](https://echo.labstack.com) docs for more info.
 ### Service
 ``service`` package is responsible for handling config init and database connections and monitoring tools.

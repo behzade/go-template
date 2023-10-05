@@ -1,18 +1,16 @@
 package controller
 
 import (
-	"log"
-
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 )
 
 type App struct {
-	fiber fiber.App
+	echo *echo.Echo
 }
 
 func New() *App {
 	app := App{
-		fiber: *fiber.New(),
+		echo: echo.New(),
 	}
 
 	app.initRoutes()
@@ -20,10 +18,10 @@ func New() *App {
 }
 
 func (a *App) initRoutes() {
-	a.fiber.Get("/", indexHandler)
-	a.fiber.Get("/healthz", checkHealthHandler)
+	a.echo.GET("/", indexHandler)
+	a.echo.GET("/healthz", checkHealthHandler)
 }
 
-func (a *App) Run() {
-	log.Fatal(a.fiber.Listen(":8080"))
+func (a *App) Run() error {
+	return a.echo.Start(":8080")
 }

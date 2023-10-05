@@ -1,21 +1,50 @@
-package main
+package service
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
-
-	"github.com/behzade/fiber-template/internal/service"
+	"text/template"
 )
 
-type Changes struct {
+const (
+	schemaFileLocation  = "/app/schema.sql"
+	schemaTemplateFiles = "/app/sql/schema-template/*.tmpl.sql"
+)
+
+func RenderSchemaTemplate() error {
+	config := GetConfig()
+
+	t, err := template.ParseGlob(schemaTemplateFiles)
+	if err != nil {
+		return err
+	}
+
+	f, err := os.OpenFile(schemaFileLocation, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o755)
+	if err != nil {
+		return err
+	}
+
+	err = t.ExecuteTemplate(f, "schema.tmpl.sql", map[string]string{
+		"schema": config.Database.Name,
+	})
+	if err != nil {
+		return err
+	}
+
+	return f.Close()
+}
+
+type SchemaChanges struct {
 	Pending []string `json:"Pending,omitempty"`
 	Applied []string `json:"Applied,omitempty"`
 }
 
 type ApplySchemaResult struct {
-	Changes Changes `json:"Changes,omitempty"`
+	Changes SchemaChanges `json:"Changes,omitempty"`
 }
 
 func (res *ApplySchemaResult) String() string {
@@ -50,7 +79,7 @@ func parseApplySchemaResult(data []byte) (*ApplySchemaResult, error) {
 	return &res, err
 }
 
-func diffDBWithSchema() (*ApplySchemaResult, error) {
+func DiffDBWithSchema() (*ApplySchemaResult, error) {
 	args := getSchemaApplyArgs()
 	args = append(args, "--dry-run")
 
@@ -61,12 +90,12 @@ func diffDBWithSchema() (*ApplySchemaResult, error) {
 
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, err
+		return nil, errors.Join(errors.New(string(out)), err)
 	}
 	return parseApplySchemaResult(out)
 }
 
-func syncDBWithSchema() (*ApplySchemaResult, error) {
+func SyncDBWithSchema() (*ApplySchemaResult, error) {
 	args := getSchemaApplyArgs()
 	args = append(args, "--auto-approve")
 
@@ -77,13 +106,13 @@ func syncDBWithSchema() (*ApplySchemaResult, error) {
 
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, err
+		return nil, errors.Join(errors.New(string(out)), err)
 	}
 	return parseApplySchemaResult(out)
 }
 
 func getSchemaApplyArgs() []string {
-	config := service.GetConfig()
+	config := GetConfig()
 	return []string{
 		"schema", "apply",
 		"--url", dbURL(config),
@@ -94,7 +123,7 @@ func getSchemaApplyArgs() []string {
 	}
 }
 
-func dbURL(config service.Config) string {
+func dbURL(config Config) string {
 	return fmt.Sprintf(
 		"mysql://%v:%v@%v:%v",
 		config.Database.User,
@@ -104,7 +133,7 @@ func dbURL(config service.Config) string {
 	)
 }
 
-func devDBURL(config service.Config) string {
+func devDBURL(config Config) string {
 	return fmt.Sprintf(
 		"mysql://%v:%v@%v_dev:%v",
 		config.Database.User,
@@ -112,4 +141,8 @@ func devDBURL(config service.Config) string {
 		config.Database.Host,
 		config.Database.Port,
 	)
+}
+
+func SyncEntityWithSchema() ([]byte, error) {
+	return exec.Command("sqlc", "generate").CombinedOutput()
 }

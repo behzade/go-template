@@ -20,7 +20,7 @@ RUN go mod download
 COPY ./internal ./internal
 COPY ./cmd ./cmd
 
-RUN go build -o /app/bin/server /app/cmd/server
+RUN go build -o /app/bin /app/cmd/app
 
 
 FROM build as test
@@ -28,7 +28,7 @@ RUN go test -v ./...
 
 FROM scratch as run
 
-COPY --from=build /app/bin/server /server-bin
+COPY --from=build /app/bin /app/bin
 COPY ./config.yaml /
 COPY --from=build /etc/passwd /etc/passwd
 
@@ -36,4 +36,4 @@ USER 1001
 
 EXPOSE 8080
 
-ENTRYPOINT [ "/server-bin" ]
+ENTRYPOINT [ "/app/bin", "serve" ]
