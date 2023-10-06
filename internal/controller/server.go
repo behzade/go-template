@@ -22,7 +22,7 @@ func New() *echo.Echo {
 	server := NewStrictHandler(&Server{}, nil)
 	router := echo.New()
 
-	router.GET("openapi.json",func(c echo.Context) error {
+	router.GET("openapi.json", func(c echo.Context) error {
 		swagger, err := GetSwagger()
 		swagger.Servers = nil
 		if err != nil {
