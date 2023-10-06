@@ -1,24 +1,28 @@
 package controller
 
-import "github.com/labstack/echo/v4"
+import (
+	"context"
+
+	"github.com/labstack/echo/v4"
+)
 
 type Server struct{}
 
-func New() *echo.Echo {
-	server := Server{}
-	router := echo.New()
-
-	RegisterHandlers(router, &server)
-
-	return router
-}
-
 // (GET /)
-func (server *Server) Index(ctx echo.Context) error {
-	return indexHandler(ctx)
+func (server *Server) Index(ctx context.Context, request IndexRequestObject) (IndexResponseObject, error) {
+	return Index200JSONResponse{"go template server"}, nil
 }
 
 // (GET /healthz)
-func (server *Server) Healthz(ctx echo.Context) error {
-	return checkHealthHandler(ctx)
+func (server *Server) Healthz(ctx context.Context, request HealthzRequestObject) (HealthzResponseObject, error) {
+	return Healthz200JSONResponse{"ok"}, nil
+}
+
+func New() *echo.Echo {
+	server := NewStrictHandler(&Server{}, nil)
+	router := echo.New()
+
+	RegisterHandlers(router, server)
+
+	return router
 }
