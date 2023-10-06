@@ -4,8 +4,26 @@
 package controller
 
 import (
+	"bytes"
+	"compress/gzip"
+	"context"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/url"
+	"path"
+	"strings"
+
+	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/labstack/echo/v4"
+	strictecho "github.com/oapi-codegen/runtime/strictmiddleware/echo"
 )
+
+// Message defines model for Message.
+type Message struct {
+	Message string `json:"message"`
+}
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -71,4 +89,187 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/", wrapper.Index)
 	router.GET(baseURL+"/healthz", wrapper.Healthz)
 
+}
+
+type IndexRequestObject struct {
+}
+
+type IndexResponseObject interface {
+	VisitIndexResponse(w http.ResponseWriter) error
+}
+
+type Index200JSONResponse Message
+
+func (response Index200JSONResponse) VisitIndexResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type HealthzRequestObject struct {
+}
+
+type HealthzResponseObject interface {
+	VisitHealthzResponse(w http.ResponseWriter) error
+}
+
+type Healthz200JSONResponse Message
+
+func (response Healthz200JSONResponse) VisitHealthzResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+// StrictServerInterface represents all server handlers.
+type StrictServerInterface interface {
+
+	// (GET /)
+	Index(ctx context.Context, request IndexRequestObject) (IndexResponseObject, error)
+
+	// (GET /healthz)
+	Healthz(ctx context.Context, request HealthzRequestObject) (HealthzResponseObject, error)
+}
+
+type StrictHandlerFunc = strictecho.StrictEchoHandlerFunc
+type StrictMiddlewareFunc = strictecho.StrictEchoMiddlewareFunc
+
+func NewStrictHandler(ssi StrictServerInterface, middlewares []StrictMiddlewareFunc) ServerInterface {
+	return &strictHandler{ssi: ssi, middlewares: middlewares}
+}
+
+type strictHandler struct {
+	ssi         StrictServerInterface
+	middlewares []StrictMiddlewareFunc
+}
+
+// Index operation middleware
+func (sh *strictHandler) Index(ctx echo.Context) error {
+	var request IndexRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.Index(ctx.Request().Context(), request.(IndexRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "Index")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(IndexResponseObject); ok {
+		return validResponse.VisitIndexResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// Healthz operation middleware
+func (sh *strictHandler) Healthz(ctx echo.Context) error {
+	var request HealthzRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.Healthz(ctx.Request().Context(), request.(HealthzRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "Healthz")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(HealthzResponseObject); ok {
+		return validResponse.VisitHealthzResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// Base64 encoded, gzipped, json marshaled Swagger object
+var swaggerSpec = []string{
+
+	"H4sIAAAAAAAC/8SQQU7DMBBFrxJ9WEZNBJvKJ6ALTlC6MM60cXHGZuwgoPLdkd2GCiHWbDKjzPefef8E",
+	"46fgmThFqBOiGWnStX2kGPWBShvEB5JkqQ6m6yB9BIJCTGL5gJxbCL3OVmiA2n4Ld+0i9M9HMgm5KC3v",
+	"PRTPzrXwgVgHC4X7Vb/q0SLoNNZtXfkcKJUyUDRiQ7KeoSCUZuEmiC+mDeuJUK1EF8VmgMKGB3pHOSsG",
+	"z/EMcNf3pRjPibga6xCcNfVZd4zFfYmidLdCeyjcdNesuktQ3ZJSRfp5ny27m2VzUeQW3UjapfHzT6rz",
+	"vDEjmZeGeAjecnriX2QPF5//YbtkH0nerKHmfHRFzC3KX5IItT1hFgcF5412o49Jrft1j7zLXwEAAP//",
+	"ffCWRHkCAAA=",
+}
+
+// GetSwagger returns the content of the embedded swagger specification file
+// or error if failed to decode
+func decodeSpec() ([]byte, error) {
+	zipped, err := base64.StdEncoding.DecodeString(strings.Join(swaggerSpec, ""))
+	if err != nil {
+		return nil, fmt.Errorf("error base64 decoding spec: %w", err)
+	}
+	zr, err := gzip.NewReader(bytes.NewReader(zipped))
+	if err != nil {
+		return nil, fmt.Errorf("error decompressing spec: %w", err)
+	}
+	var buf bytes.Buffer
+	_, err = buf.ReadFrom(zr)
+	if err != nil {
+		return nil, fmt.Errorf("error decompressing spec: %w", err)
+	}
+
+	return buf.Bytes(), nil
+}
+
+var rawSpec = decodeSpecCached()
+
+// a naive cached of a decoded swagger spec
+func decodeSpecCached() func() ([]byte, error) {
+	data, err := decodeSpec()
+	return func() ([]byte, error) {
+		return data, err
+	}
+}
+
+// Constructs a synthetic filesystem for resolving external references when loading openapi specifications.
+func PathToRawSpec(pathToFile string) map[string]func() ([]byte, error) {
+	res := make(map[string]func() ([]byte, error))
+	if len(pathToFile) > 0 {
+		res[pathToFile] = rawSpec
+	}
+
+	return res
+}
+
+// GetSwagger returns the Swagger specification corresponding to the generated code
+// in this file. The external references of Swagger specification are resolved.
+// The logic of resolving external references is tightly connected to "import-mapping" feature.
+// Externally referenced files must be embedded in the corresponding golang packages.
+// Urls can be supported but this task was out of the scope.
+func GetSwagger() (swagger *openapi3.T, err error) {
+	resolvePath := PathToRawSpec("")
+
+	loader := openapi3.NewLoader()
+	loader.IsExternalRefsAllowed = true
+	loader.ReadFromURIFunc = func(loader *openapi3.Loader, url *url.URL) ([]byte, error) {
+		pathToFile := url.String()
+		pathToFile = path.Clean(pathToFile)
+		getSpec, ok := resolvePath[pathToFile]
+		if !ok {
+			err1 := fmt.Errorf("path not found: %s", pathToFile)
+			return nil, err1
+		}
+		return getSpec()
+	}
+	var specData []byte
+	specData, err = rawSpec()
+	if err != nil {
+		return
+	}
+	swagger, err = loader.LoadFromData(specData)
+	if err != nil {
+		return
+	}
+	return
 }

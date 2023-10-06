@@ -2,9 +2,6 @@
 
 COMPOSE = docker compose -f ./docker/docker-compose.yaml
 CLI = $(COMPOSE) exec app go run /app
-OAPI = $(COMPOSE) exec app oapi-codegen -generate
-OAPI_TYPES = $(OAPI) types -o "./internal/controller/api-types.go" -package "controller" "./api/openapi/service.yaml" 
-OAPI_SERVER = $(OAPI) server -o "./internal/controller/api.go" -package "controller" "./api/openapi/service.yaml" 
 
 build:
 	$(COMPOSE) build
@@ -27,4 +24,4 @@ get_alters:
 apply_alters:
 	$(CLI) apply_alters
 api:
-	$(OAPI_TYPES) && $(OAPI_SERVER)
+	$(COMPOSE) exec app oapi-codegen --config="./api/config.yaml" "./api/service.yaml" 

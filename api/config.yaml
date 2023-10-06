@@ -1,0 +1,7 @@
+package: controller
+generate:
+  echo-server: true
+  models: true
+  strict-server: true
+  embedded-spec: true
+output: ./internal/controller/api.go
