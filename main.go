@@ -8,7 +8,7 @@ import (
 
 func main() {
 	r := command.NewDefault()
-	res,err := r.Run()
+	res, err := r.Run()
 	statusCode := 0
 	if err != nil {
 		statusCode = 1

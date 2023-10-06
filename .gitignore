@@ -1,2 +1,2 @@
-build/.env
+docker/.env
 schema.sql

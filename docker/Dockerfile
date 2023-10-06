@@ -18,9 +18,9 @@ ARG GOPROXY=https://goproxy.cn
 RUN go mod download
 
 COPY ./internal ./internal
-COPY ./cmd ./cmd
+COPY ./main.go ./
 
-RUN go build -o /app/bin /app/cmd/app
+RUN go build -o /app/bin
 
 
 FROM build as test

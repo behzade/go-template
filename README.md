@@ -23,9 +23,9 @@ This project is a template for building web applications using Go, echo, and MyS
 
 ## Project Structure
 ### Docker
-The project runtime is dockerized in two different docker files. Dockerfile.dev for developement with live reload and Dockerfile that is intended to be the production container definition. The docker and compose are stored in the ``build`` directory.
+The project runtime is dockerized in two different docker files. Dockerfile.dev for developement with live reload and Dockerfile that is intended to be the production container definition. The docker and compose are stored in the ``docker`` directory.
 #### Docker Registry
-You can override the default docker registry by adding the following value to ``build/.env``
+You can override the default docker registry by adding the following value to ``docker/.env``
 ```
 DOCKER_REGISTRY=<your-docker-registry>
 
@@ -43,7 +43,7 @@ Project config is stored in the ``config.yaml`` at the root of the project. This
 	} `yaml:"database"`
 ```
 ### Env Variables
-You can override the local config with env variables by adding the file ``build/.env``.
+You can override the local config with env variables by adding the file ``docker/.env``.
 ### Database
 #### Schema
 Database schema is stored in the ``schema.tmpl.sql`` file in the ``sql/schema-template`` directory. You can put your partial templates in the same directory. The template is rendered to a single sql file which represents the desired database state. Schema template example with partial templates:
