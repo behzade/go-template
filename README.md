@@ -1,6 +1,6 @@
 # Go Template
 Go template project with echo and mysql
-This project is a template for building web applications using Go, echo, and MySQL. It provides a dockerized environment, a config system, a database schema management, and an entity package for interacting with the database.
+This project is a template for building web applications using Go, echo, and MySQL. It provides a dockerized environment, a config system, a database schema management and code gen from database schema and openapi specification.
 
 # Table of Contents
 - [Getting Started](#getting-started)
@@ -10,6 +10,7 @@ This project is a template for building web applications using Go, echo, and MyS
     - [Database](#database)
         - [Schema](#schema)
             - [Altering the Schema](#altering-the-schema)
+    - [API] (#api)
 - [Packages](#packages)
     - [Entity](#entity)
     - [Controller](#controller)
@@ -91,7 +92,8 @@ type LocaldbUser struct {
 	UpdatedAt time.Time
 }
 ```
-
+### API
+``api`` dir holds the openapi specification and the code gen config for [oapi-codegen](https://github.com/deepmap/oapi-codegen). To generate the server interface from specification use ``make api``. This generates/updates ``internal/controller/api.go`` file.
 
 ## Packages
 ### Entity
@@ -116,6 +118,6 @@ func (q *Queries) GetUser(ctx context.Context, id uint64) (LocaldbUser, error) {
 ```
 Keep in mind that this package needs to be regenerated after making changes to schema/query using ``make sync_entity``.
 ### Controller
-``echo`` is the router of choice for this project. Define new routes in the ``controller/router.go``. Refer to [echo](https://echo.labstack.com) docs for more info.
+``echo`` is the router of choice for this project. Routes are generated from the openapi specification in ``./api/service.yaml``. To use, simply implement the ``ServerInterface`` or ``StrictServerInterface`` for your specification.
 ### Service
 ``service`` package is responsible for handling config init and database connections and monitoring tools.
