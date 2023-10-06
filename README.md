@@ -80,7 +80,7 @@ Now we should run ``make get_alters`` to see the changes database.
 Pending Alters:
 ALTER TABLE `localdb`.`user` ADD COLUMN `age` int NULL
 ```
-And ``make update_entity`` to update the generated go code in entity package:
+And ``make sync_entity`` to update the generated go code in entity package:
 
 ```go
 type LocaldbUser struct {
@@ -114,7 +114,7 @@ func (q *Queries) GetUser(ctx context.Context, id uint64) (LocaldbUser, error) {
 	return i, err
 }
 ```
-Keep in mind that this package needs to be regenerated after making changes to schema/query using ``make update_entity``.
+Keep in mind that this package needs to be regenerated after making changes to schema/query using ``make sync_entity``.
 ### Controller
 ``echo`` is the router of choice for this project. Define new routes in the ``controller/router.go``. Refer to [echo](https://echo.labstack.com) docs for more info.
 ### Service
