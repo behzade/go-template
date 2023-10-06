@@ -17,8 +17,8 @@ logs:
 	$(COMPOSE) logs app --tail=20 --follow
 bash:
 	$(COMPOSE) exec app bash
-update_entity:
-	$(CLI) update_entity
+sync_entity:
+	$(CLI) sync_entity
 get_alters:
 	$(CLI) get_alters
 apply_alters:
