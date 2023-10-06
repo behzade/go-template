@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	schemaFileLocation  = "/app/sql/schema.sql"
+	schemaFileLocation  = "/app/schema.sql"
 	schemaTemplateFiles = "/app/sql/schema"
 )
 
