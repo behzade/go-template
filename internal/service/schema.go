@@ -11,14 +11,19 @@ import (
 )
 
 const (
-	schemaFileLocation  = "/app/schema.sql"
-	schemaTemplateFiles = "/app/sql/schema-template/*.tmpl.sql"
+	schemaFileLocation  = "/app/sql/schema.sql"
+	schemaTemplateFiles = "/app/sql/schema"
 )
 
 func RenderSchemaTemplate() error {
 	config := GetConfig()
 
-	t, err := template.ParseGlob(schemaTemplateFiles)
+	t,err := template.ParseGlob(fmt.Sprintf("%v/partials/*.sql", schemaTemplateFiles))
+	if err != nil {
+		return err
+	}
+
+	t, err = t.ParseGlob(fmt.Sprintf("%v/*.sql", schemaTemplateFiles))
 	if err != nil {
 		return err
 	}
@@ -28,7 +33,7 @@ func RenderSchemaTemplate() error {
 		return err
 	}
 
-	err = t.ExecuteTemplate(f, "schema.tmpl.sql", map[string]string{
+	err = t.ExecuteTemplate(f, "schema.sql", map[string]string{
 		"schema": config.Database.Name,
 	})
 	if err != nil {

@@ -19,7 +19,7 @@ func (SyncEntityCommand) Name() string {
 }
 
 func (SyncEntityCommand) Description() string {
-	return "Syncs the entity package with the schema defined in the schema.tmpl.sql"
+	return "Syncs the entity package with the schema defined in the schema.sql"
 }
 
 type GetAlterCommand struct{}
