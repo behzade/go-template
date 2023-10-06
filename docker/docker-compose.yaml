@@ -1,4 +1,5 @@
 ---
+name: go-template
 services:
   app:
     container_name: app
