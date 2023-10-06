@@ -30,7 +30,7 @@ func (GetAlterCommand) Run() (string, error) {
 		return "", err
 	}
 
-	res, err := service.DiffDBWithSchema()
+	res, err := service.SyncDBWithSchema(true)
 	if err != nil {
 		return "", err
 	}
@@ -54,7 +54,7 @@ func (ApplyAltersCommand) Run() (string, error) {
 		return "", err
 	}
 
-	res, err := service.SyncDBWithSchema()
+	res, err := service.SyncDBWithSchema(false)
 	if err != nil {
 		return "", err
 	}

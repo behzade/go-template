@@ -79,25 +79,14 @@ func parseApplySchemaResult(data []byte) (*ApplySchemaResult, error) {
 	return &res, err
 }
 
-func DiffDBWithSchema() (*ApplySchemaResult, error) {
+func SyncDBWithSchema(dryRun bool) (*ApplySchemaResult, error) {
 	args := getSchemaApplyArgs()
-	args = append(args, "--dry-run")
 
-	cmd := exec.Command(
-		"atlas",
-		args...,
-	)
-
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return nil, errors.Join(errors.New(string(out)), err)
+	if dryRun {
+		args = append(args, "--dry-run")
+	} else {
+		args = append(args, "--auto-approve")
 	}
-	return parseApplySchemaResult(out)
-}
-
-func SyncDBWithSchema() (*ApplySchemaResult, error) {
-	args := getSchemaApplyArgs()
-	args = append(args, "--auto-approve")
 
 	cmd := exec.Command(
 		"atlas",
