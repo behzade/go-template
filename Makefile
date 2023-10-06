@@ -1,7 +1,7 @@
 .PHONY: *
 
 COMPOSE = docker compose -f ./docker/docker-compose.yaml
-CLI = $(COMPOSE) exec app go run /app/cmd/cli
+CLI = $(COMPOSE) exec app go run /app
 
 build:
 	$(COMPOSE) build
