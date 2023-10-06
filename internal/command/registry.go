@@ -23,7 +23,7 @@ func NewDefault() *CommandRegistry {
 		commands: map[string]Command{},
 	}
 
-	r.MustRegister(ServeCommand{})
+	r.MustRegister(ServerCommand{})
 	r.MustRegister(SyncEntityCommand{})
 	r.MustRegister(GetAlterCommand{})
 	r.MustRegister(ApplyAltersCommand{})
