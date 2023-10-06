@@ -33,7 +33,6 @@ func NewDefault() *CommandRegistry {
 
 func (r *CommandRegistry) MustRegister(command Command) {
 	err := r.Register(command)
-
 	if err != nil {
 		panic(err)
 	}
