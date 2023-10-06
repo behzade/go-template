@@ -36,4 +36,4 @@ USER 1001
 
 EXPOSE 8080
 
-ENTRYPOINT [ "/app/bin", "serve" ]
+ENTRYPOINT [ "/app/bin", "server" ]
