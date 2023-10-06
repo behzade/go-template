@@ -61,7 +61,6 @@ func readYamlConfig(cfg *Config) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
 
 	decoder := yaml.NewDecoder(f)
 	err = decoder.Decode(&cfg)
@@ -69,5 +68,5 @@ func readYamlConfig(cfg *Config) error {
 		return err
 	}
 
-	return nil
+	return f.Close()
 }
