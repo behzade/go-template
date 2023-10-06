@@ -8,6 +8,12 @@ import (
 	"strings"
 )
 
+type Command interface {
+	Run() (string, error)
+	Name() string
+	Description() string
+}
+
 type CommandRegistry struct {
 	commands map[string]Command
 }
