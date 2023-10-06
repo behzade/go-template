@@ -5,7 +5,7 @@ import "github.com/behzade/go-template/internal/controller"
 type ServerCommand struct{}
 
 func (ServerCommand) Run() (string, error) {
-	err := controller.New().Run()
+	err := controller.New().Start(":8080")
 	return "", err
 }
 

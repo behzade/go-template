@@ -11,6 +11,7 @@ WORKDIR /app
 
 RUN go install github.com/bokwoon95/wgo@latest
 RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.20.0
+RUN go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest
 RUN curl -sSf https://atlasgo.sh | sh
 
 

@@ -1,0 +1,47 @@
+openapi: "3.0.0"
+servers:
+  - url: localhost:8080
+paths:
+  /:
+    get:
+      description: return project name
+      operationId: index
+      responses:
+        '200':
+          description: index response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /healthz:
+    get:
+      description: |
+        health check endpoint
+      operationId: healthz
+      responses:
+        '200':
+          description: return service health
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+components:
+  schemas:
+    Message:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
