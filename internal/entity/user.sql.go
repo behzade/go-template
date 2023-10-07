@@ -33,3 +33,40 @@ func (q *Queries) GetUser(ctx context.Context, id uint64) (LocaldbUser, error) {
 	)
 	return i, err
 }
+
+const getUsers = `-- name: GetUsers :many
+select id, name, created_at, updated_at from localdb.user limit ? offset ?
+`
+
+type GetUsersParams struct {
+	Limit  int32
+	Offset int32
+}
+
+func (q *Queries) GetUsers(ctx context.Context, arg GetUsersParams) ([]LocaldbUser, error) {
+	rows, err := q.db.QueryContext(ctx, getUsers, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []LocaldbUser
+	for rows.Next() {
+		var i LocaldbUser
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
