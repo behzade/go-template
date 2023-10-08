@@ -10,7 +10,7 @@ This project is a template for building web applications using Go, echo, and MyS
     - [Database](#database)
         - [Schema](#schema)
             - [Altering the Schema](#altering-the-schema)
-    - [API] (#api)
+    - [API](#api)
 - [Packages](#packages)
     - [Entity](#entity)
     - [Controller](#controller)
